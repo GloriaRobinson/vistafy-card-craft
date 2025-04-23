@@ -1,10 +1,9 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import CardForm from "@/components/CardForm";
-import CardPreview from "@/components/CardPreview";
-import QRCodeGenerator from "@/components/QRCodeGenerator";
+import CardQuickPreview from "@/components/CardQuickPreview";
 import { CardData, defaultCardData } from "@/types";
 import { nanoid } from "nanoid";
 
@@ -23,7 +22,6 @@ const Index: React.FC = () => {
   };
 
   const saveCard = () => {
-    // Validate required fields
     if (!cardData.fullName || !cardData.title || !cardData.email) {
       toast({
         title: "Missing required fields",
@@ -32,15 +30,11 @@ const Index: React.FC = () => {
       });
       return;
     }
-
     try {
-      // In a real app, we would save to a database
-      // For demo purposes, we'll save to local storage
       localStorage.setItem(
         `vistafy-card-${cardData.cardId}`,
         JSON.stringify(cardData)
       );
-
       toast({
         title: "Card saved successfully!",
         description: "Your digital business card is ready to share.",
@@ -64,7 +58,6 @@ const Index: React.FC = () => {
           </h1>
         </div>
       </header>
-
       <main className="container py-8">
         <div className="text-center mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold mb-2">Create Your Digital Business Card</h2>
@@ -73,11 +66,9 @@ const Index: React.FC = () => {
             that can be shared via QR code or direct link.
           </p>
         </div>
-
         <div className="grid lg:grid-cols-5 gap-8">
           <div className="lg:col-span-3 space-y-6">
             <CardForm cardData={cardData} onUpdateCardData={updateCardData} />
-            
             <div className="text-center">
               <Button 
                 className="px-8 py-6 text-lg"
@@ -87,14 +78,11 @@ const Index: React.FC = () => {
               </Button>
             </div>
           </div>
-          
           <div className="lg:col-span-2 space-y-6">
-            <CardPreview cardData={cardData} />
-            <QRCodeGenerator cardId={cardData.cardId || ""} />
+            <CardQuickPreview cardData={cardData} />
           </div>
         </div>
       </main>
-
       <footer className="bg-vistafy-light-gray py-6 mt-12">
         <div className="container text-center">
           <p className="text-sm text-muted-foreground">
