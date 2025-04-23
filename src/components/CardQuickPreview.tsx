@@ -1,8 +1,7 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CardData } from "@/types";
-import { QRCode } from "lucide-react";
+import { QrCode } from "lucide-react";
 
 interface CardQuickPreviewProps {
   cardData: CardData;
