@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import CardForm from "@/components/CardForm";
 import CardQuickPreview from "@/components/CardQuickPreview";
 import { CardData, defaultCardData } from "@/types";
@@ -13,6 +14,7 @@ const Index: React.FC = () => {
     cardId: nanoid(8),
   });
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const updateCardData = (newData: Partial<CardData>) => {
     setCardData((prev) => ({
@@ -39,6 +41,9 @@ const Index: React.FC = () => {
         title: "Card saved successfully!",
         description: "Your digital business card is ready to share.",
       });
+      
+      // Navigate to the card view page
+      navigate(`/card/${cardData.cardId}`);
     } catch (error) {
       console.error("Failed to save card:", error);
       toast({
