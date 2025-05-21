@@ -15,6 +15,7 @@ export interface CardData {
   whatsapp: string;
   youtube: string;
   cardId?: string;
+  linkedInWebsite?: string;
 }
 
 export const defaultCardData: CardData = {
@@ -32,4 +33,5 @@ export const defaultCardData: CardData = {
   threads: "",
   whatsapp: "",
   youtube: "",
+  linkedInWebsite: "",
 };

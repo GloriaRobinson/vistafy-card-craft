@@ -8,11 +8,11 @@ interface CardTemplateSelectorProps {
 }
 
 const CARD_TEMPLATES = [
-  { value: "professional", label: "Professional", color: "bg-gradient-to-r from-slate-50 to-slate-100 border-t-vistafy-purple" },
-  { value: "gradient", label: "Gradient", color: "bg-gradient-to-br from-vistafy-soft-purple to-white border-t-vistafy-purple" },
-  { value: "dark", label: "Dark", color: "bg-gradient-to-br from-slate-900 to-slate-800 text-white border-t-vistafy-purple" },
-  { value: "minimal", label: "Minimal", color: "bg-white border-gray-200 border" },
-  { value: "vibrant", label: "Vibrant", color: "bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400 border-t-pink-500" }
+  { value: "blue", label: "Modern Blue", color: "bg-gradient-to-r from-blue-500 to-blue-800 border-l-4 border-blue-300 text-white" },
+  { value: "corporate", label: "Corporate", color: "bg-gradient-to-br from-white to-gray-100 border-t-4 border-blue-900" },
+  { value: "orange", label: "Orange Accent", color: "bg-white border-l-4 border-orange-500" },
+  { value: "dark", label: "Dark Gold", color: "bg-gradient-to-r from-gray-900 to-gray-800 border-l-4 border-amber-500 text-white" },
+  { value: "minimal", label: "Minimal", color: "bg-white border border-gray-200" }
 ];
 
 const CardTemplateSelector: React.FC<CardTemplateSelectorProps> = ({ template, setTemplate }) => {

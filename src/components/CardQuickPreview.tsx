@@ -13,15 +13,15 @@ interface CardQuickPreviewProps {
 }
 
 const TEMPLATE_STYLES: Record<string, string> = {
-  professional: "p-0 overflow-hidden card-shadow border-t-4 border-t-vistafy-purple bg-gradient-to-r from-slate-50 to-slate-100",
-  gradient: "p-0 overflow-hidden card-shadow border-t-4 border-t-vistafy-purple bg-gradient-to-br from-vistafy-soft-purple to-white",
-  dark: "p-0 overflow-hidden card-shadow border-t-4 border-t-vistafy-purple bg-gradient-to-br from-slate-900 to-slate-800 text-white",
+  blue: "p-0 overflow-hidden card-shadow border-l-4 border-blue-300 bg-gradient-to-r from-blue-500 to-blue-800 text-white",
+  corporate: "p-0 overflow-hidden card-shadow border-t-4 border-blue-900 bg-gradient-to-br from-white to-gray-100",
+  orange: "p-0 overflow-hidden card-shadow border-l-4 border-orange-500 bg-white",
+  dark: "p-0 overflow-hidden card-shadow border-l-4 border-amber-500 bg-gradient-to-r from-gray-900 to-gray-800 text-white",
   minimal: "p-0 border border-gray-200 bg-white",
-  vibrant: "p-0 overflow-hidden card-shadow border-t-4 border-t-pink-500 bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400"
 };
 
 const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
-  const [template, setTemplate] = useState<string>("professional");
+  const [template, setTemplate] = useState<string>("blue");
   const previewRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -35,7 +35,7 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
   const qrCodeUrl = cardData.cardId
     ? `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${encodeURIComponent(
         cardUrl
-      )}&chco=9b87f5&chld=M|1`
+      )}&chco=000000&chld=L|1`
     : "";
 
   // Download the preview as image
@@ -72,13 +72,24 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
 
   // Get text color based on template
   const getTextClass = () => {
-    if (template === "dark") return "text-white";
-    return "text-vistafy-purple";
+    if (template === "dark" || template === "blue") return "text-white";
+    return "text-gray-800";
   };
 
   const getMutedTextClass = () => {
-    if (template === "dark") return "text-gray-300";
+    if (template === "dark" || template === "blue") return "text-gray-300";
     return "text-muted-foreground";
+  };
+
+  const getHighlightClass = () => {
+    switch(template) {
+      case "blue": return "text-blue-200";
+      case "dark": return "text-amber-400";
+      case "orange": return "text-orange-500";
+      case "corporate": return "text-blue-900";
+      case "minimal": return "text-vistafy-purple";
+      default: return "text-vistafy-purple";
+    }
   };
 
   return (
@@ -114,19 +125,19 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
           )}
           
           <div className="text-center space-y-1 w-full">
-            <h2 className={`font-semibold text-lg ${template === "dark" ? "text-white" : ""}`}>
+            <h2 className={`font-semibold text-lg ${getTextClass()}`}>
               {cardData.fullName || <span className="opacity-50">Full Name</span>}
             </h2>
             
-            <div className={template === "dark" ? "text-gray-300" : "text-vistafy-dark-purple"}>
+            <div className={getHighlightClass()}>
               {cardData.title || <span className="opacity-50">Title/Profession</span>}
             </div>
             
             <div className="text-sm">
               {cardData.email && (
                 <p>
-                  <span className={`font-medium ${template === "dark" ? "text-gray-300" : ""}`}>Email:</span>{" "}
-                  <a href={`mailto:${cardData.email}`} className={template === "dark" ? "text-indigo-300 hover:underline" : "text-vistafy-purple hover:underline"}>
+                  <span className={`font-medium ${getTextClass()}`}>Email:</span>{" "}
+                  <a href={`mailto:${cardData.email}`} className={template === "dark" ? "text-amber-400 hover:underline" : template === "blue" ? "text-blue-200 hover:underline" : "text-vistafy-purple hover:underline"}>
                     {cardData.email}
                   </a>
                 </p>
@@ -134,8 +145,8 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
               
               {cardData.phone && (
                 <p>
-                  <span className={`font-medium ${template === "dark" ? "text-gray-300" : ""}`}>Phone:</span>{" "}
-                  <a href={`tel:${cardData.phone}`} className={template === "dark" ? "text-indigo-300 hover:underline" : "text-vistafy-purple hover:underline"}>
+                  <span className={`font-medium ${getTextClass()}`}>Phone:</span>{" "}
+                  <a href={`tel:${cardData.phone}`} className={template === "dark" ? "text-amber-400 hover:underline" : template === "blue" ? "text-blue-200 hover:underline" : "text-vistafy-purple hover:underline"}>
                     {cardData.phone}
                   </a>
                 </p>
@@ -143,8 +154,8 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
               
               {cardData.location && (
                 <p>
-                  <span className={`font-medium ${template === "dark" ? "text-gray-300" : ""}`}>Location:</span>{" "}
-                  <span className={template === "dark" ? "text-indigo-300" : "text-vistafy-purple"}>
+                  <span className={`font-medium ${getTextClass()}`}>Location:</span>{" "}
+                  <span className={template === "dark" ? "text-amber-400" : template === "blue" ? "text-blue-200" : "text-vistafy-purple"}>
                     {cardData.location}
                   </span>
                 </p>
@@ -153,9 +164,15 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
           </div>
         </CardContent>
         
-        <CardFooter className={`border-t pt-3 pb-3 flex justify-center ${template === "dark" ? "border-gray-700 bg-gray-900" : "bg-vistafy-light-gray"}`}>
-          <p className={`text-xs ${template === "dark" ? "text-gray-400" : "text-muted-foreground"}`}>
-            Created with <span className={template === "dark" ? "text-indigo-300" : "text-vistafy-purple"}>Vistafy</span>
+        <CardFooter className={`border-t pt-3 pb-3 flex justify-center ${
+          template === "dark" 
+            ? "border-gray-700 bg-gray-900" 
+            : template === "blue"
+              ? "border-blue-700 bg-blue-900"
+              : "bg-vistafy-light-gray"
+        }`}>
+          <p className={`text-xs ${template === "dark" || template === "blue" ? "text-gray-400" : "text-muted-foreground"}`}>
+            Created with <span className={template === "dark" ? "text-amber-400" : template === "blue" ? "text-blue-200" : "text-vistafy-purple"}>Vistafy</span>
           </p>
         </CardFooter>
       </div>
