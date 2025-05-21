@@ -23,7 +23,9 @@ const TEMPLATE_STYLES: Record<string, string> = {
 const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
   const [template, setTemplate] = useState<string>("professional");
   const previewRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [showPreviewLabels, setShowPreviewLabels] = useState(true);
 
   const cardUrl = cardData.cardId
     ? `${window.location.origin}/card/${cardData.cardId}`
@@ -38,11 +40,17 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
 
   // Download the preview as image
   const handleDownload = async () => {
-    if (!previewRef.current) return;
+    if (!cardRef.current) return;
     setIsDownloading(true);
     
+    // Temporarily hide preview labels
+    setShowPreviewLabels(false);
+    
     try {
-      const canvas = await html2canvas(previewRef.current, {
+      // Wait for UI update after hiding labels
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const canvas = await html2canvas(cardRef.current, {
         backgroundColor: null,
         useCORS: true,
         scale: 2,
@@ -56,6 +64,8 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
     } catch (error) {
       console.error("Failed to download card:", error);
     } finally {
+      // Restore labels after download
+      setShowPreviewLabels(true);
       setIsDownloading(false);
     }
   };
@@ -72,23 +82,25 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
   };
 
   return (
-    <div>
+    <div ref={previewRef}>
       <CardTemplateSelector template={template} setTemplate={setTemplate} />
       
       <div 
-        ref={previewRef} 
+        ref={cardRef} 
         className={`relative max-w-xs mx-auto rounded-lg shadow-md ${TEMPLATE_STYLES[template]}`}
       >
-        <CardHeader className="pb-2">
-          <CardTitle className={cn("text-center text-xl flex items-center gap-2 justify-center", getTextClass())}>
-            <QrCode className="w-5 h-5 mr-1" /> Card Preview
-          </CardTitle>
-          <CardDescription className={getMutedTextClass()}>
-            This is how others will see your card
-          </CardDescription>
-        </CardHeader>
+        {showPreviewLabels && (
+          <CardHeader className="pb-2">
+            <CardTitle className={cn("text-center text-xl flex items-center gap-2 justify-center", getTextClass())}>
+              <QrCode className="w-5 h-5 mr-1" /> Card Preview
+            </CardTitle>
+            <CardDescription className={getMutedTextClass()}>
+              This is how others will see your card
+            </CardDescription>
+          </CardHeader>
+        )}
         
-        <CardContent className="space-y-3 flex flex-col items-center">
+        <CardContent className={`space-y-3 flex flex-col items-center ${!showPreviewLabels ? 'pt-6' : ''}`}>
           {qrCodeUrl && (
             <div className="bg-white p-2 rounded-md shadow-sm mb-2">
               <img 
@@ -96,6 +108,7 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
                 alt="QR Code"
                 className="w-32 h-32 mx-auto"
                 draggable={false}
+                crossOrigin="anonymous"
               />
             </div>
           )}
