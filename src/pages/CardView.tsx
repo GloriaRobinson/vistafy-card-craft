@@ -2,9 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import CardPreview from "@/components/CardPreview";
 import { CardData, defaultCardData } from "@/types";
-import { ArrowLeft, Share2, Download, QrCode } from "lucide-react";
+import { ArrowLeft, Share2, Download, QrCode, Mail, Phone, MapPin } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import html2canvas from "html2canvas";
@@ -59,8 +58,15 @@ const CardView: React.FC = () => {
       const canvas = await html2canvas(element, {
         backgroundColor: null,
         useCORS: true,
-        scale: 2,
+        scale: 3, // Increased resolution
         logging: false,
+        onclone: (document, element) => {
+          // Ensure all images are loaded properly in the clone
+          const images = element.getElementsByTagName('img');
+          for (let i = 0; i < images.length; i++) {
+            images[i].crossOrigin = "anonymous";
+          }
+        }
       });
       
       const link = document.createElement("a");
@@ -103,16 +109,16 @@ const CardView: React.FC = () => {
     
     // If website is provided, create QR for website
     if (cardData.linkedInWebsite) {
-      return `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(cardData.linkedInWebsite)}&chco=000000&chld=L|1`;
+      return `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(cardData.linkedInWebsite)}&chco=000000&chld=H|1`;
     } 
     // If WhatsApp number is available, create WhatsApp QR
     else if (cardData.phone) {
       // Format number for WhatsApp (remove spaces, dashes, etc.)
       const formattedPhone = cardData.phone.replace(/\D/g, '');
-      return `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(`https://wa.me/${formattedPhone}`)}&chco=000000&chld=L|1`;
+      return `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(`https://wa.me/${formattedPhone}`)}&chco=000000&chld=H|1`;
     }
     // Default to card URL
-    return `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(cardUrl)}&chco=000000&chld=L|1`;
+    return `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(cardUrl)}&chco=000000&chld=H|1`;
   };
 
   if (loading) {
@@ -204,6 +210,7 @@ const CardView: React.FC = () => {
                     alt="QR Code"
                     className="w-full h-auto max-w-[240px]"
                     crossOrigin="anonymous"
+                    style={{ imageRendering: 'high-quality' }}
                   />
                 </div>
               </CardContent>
@@ -230,11 +237,11 @@ const CardView: React.FC = () => {
   );
 };
 
-// New professional card template based on examples provided
+// Professional card template based on the uploaded example
 const ProfessionalCardPreview: React.FC<{ cardData: CardData }> = ({ cardData }) => {
   // Determine which template to use based on URL params or default
   const templateStyle = new URLSearchParams(window.location.search).get('template') || 'blue';
-  
+
   const getTemplateStyles = () => {
     switch (templateStyle) {
       case 'dark':
@@ -243,6 +250,7 @@ const ProfessionalCardPreview: React.FC<{ cardData: CardData }> = ({ cardData })
           accentClass: "border-l-4 border-amber-500",
           highlightClass: "text-amber-400",
           logoBackground: "bg-amber-500 bg-opacity-20",
+          iconClass: "text-amber-400",
         };
       case 'orange':
         return {
@@ -250,6 +258,7 @@ const ProfessionalCardPreview: React.FC<{ cardData: CardData }> = ({ cardData })
           accentClass: "border-l-4 border-orange-500",
           highlightClass: "text-orange-500",
           logoBackground: "bg-gradient-to-br from-orange-400 to-orange-600",
+          iconClass: "text-orange-500",
         };
       case 'corporate':
         return {
@@ -257,70 +266,86 @@ const ProfessionalCardPreview: React.FC<{ cardData: CardData }> = ({ cardData })
           accentClass: "border-t-4 border-blue-900",
           highlightClass: "text-blue-900",
           logoBackground: "bg-blue-900",
+          iconClass: "text-blue-900",
         };
-      default: // blue template
+      default: // blue template based on uploaded image
         return {
           mainClass: "bg-gradient-to-r from-blue-500 to-blue-800 text-white",
           accentClass: "border-l-4 border-blue-300",
           highlightClass: "text-white",
           logoBackground: "bg-white bg-opacity-15",
+          iconClass: "text-white",
         };
     }
   };
 
   const styles = getTemplateStyles();
+
+  // Generate QR code URL based on available data
+  const getQrCodeUrl = () => {
+    if (!cardData.cardId) return "";
+    
+    const cardUrl = `${window.location.origin}/card/${cardData.cardId}`;
+    
+    // If website is provided, create QR for website
+    if (cardData.linkedInWebsite) {
+      return `https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=${encodeURIComponent(cardData.linkedInWebsite)}&chco=000000&chld=H|1`;
+    } 
+    // If WhatsApp number is available, create WhatsApp QR
+    else if (cardData.phone) {
+      // Format number for WhatsApp (remove spaces, dashes, etc.)
+      const formattedPhone = cardData.phone.replace(/\D/g, '');
+      return `https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=${encodeURIComponent(`https://wa.me/${formattedPhone}`)}&chco=000000&chld=H|1`;
+    }
+    // Default to card URL
+    return `https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=${encodeURIComponent(cardUrl)}&chco=000000&chld=H|1`;
+  };
   
   return (
     <div className="mx-auto max-w-md">
       <div className={`rounded-lg shadow-lg overflow-hidden flex ${styles.mainClass} ${styles.accentClass}`}>
         <div className="p-6 flex-1">
-          <div className="mb-4">
+          <div className="mb-6">
             <h2 className="text-xl font-bold">{cardData.fullName || "Your Name"}</h2>
-            <p className={`${styles.highlightClass} text-sm`}>{cardData.title || "Your Title"}</p>
+            <p className={`${styles.highlightClass} text-sm font-medium`}>{cardData.title || "Your Title"}</p>
           </div>
           
-          <div className="space-y-3 text-sm">
+          <div className="space-y-4 text-sm">
             {cardData.email && (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 flex items-center justify-center text-xs rounded-full bg-opacity-30 bg-white">@</div>
+              <div className="flex items-center gap-3">
+                <Mail className={`w-5 h-5 ${styles.iconClass}`} />
                 <span>{cardData.email}</span>
               </div>
             )}
             
             {cardData.phone && (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 flex items-center justify-center text-xs rounded-full bg-opacity-30 bg-white">📞</div>
+              <div className="flex items-center gap-3">
+                <Phone className={`w-5 h-5 ${styles.iconClass}`} />
                 <span>{cardData.phone}</span>
               </div>
             )}
             
             {cardData.location && (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 flex items-center justify-center text-xs rounded-full bg-opacity-30 bg-white">📍</div>
+              <div className="flex items-center gap-3">
+                <MapPin className={`w-5 h-5 ${styles.iconClass}`} />
                 <span>{cardData.location}</span>
-              </div>
-            )}
-            
-            {cardData.linkedInWebsite && (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 flex items-center justify-center text-xs rounded-full bg-opacity-30 bg-white">🌐</div>
-                <span>{cardData.linkedInWebsite.replace(/^https?:\/\//, '')}</span>
               </div>
             )}
           </div>
         </div>
         
-        <div className="flex flex-col items-center justify-between p-4 w-1/3">
-          <div className={`w-16 h-16 ${styles.logoBackground} rounded-full flex items-center justify-center text-white font-bold text-xl`}>
+        <div className="flex flex-col items-center justify-between p-5 w-1/3">
+          <div className={`w-16 h-16 ${styles.logoBackground} rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md`}>
             {cardData.fullName ? cardData.fullName.charAt(0) : "V"}
           </div>
           
           <div className="mt-auto w-full">
             <img 
-              src={`https://chart.googleapis.com/chart?cht=qr&chs=90x90&chl=${encodeURIComponent(`${window.location.origin}/card/${cardData.cardId}`)}&chco=000000&chld=L|1`}
+              src={getQrCodeUrl()}
               alt="QR Code"
-              className="mx-auto w-20 h-20 bg-white p-1 rounded-md"
+              className="mx-auto w-24 h-24 bg-white p-1 rounded-md shadow-sm"
               crossOrigin="anonymous"
+              style={{ imageRendering: 'high-quality' }}
             />
           </div>
         </div>

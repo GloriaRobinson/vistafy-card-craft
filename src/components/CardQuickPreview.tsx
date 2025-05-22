@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import html2canvas from "html2canvas";
 import CardTemplateSelector from "./CardTemplateSelector";
-import { QrCode, Download, Share2 } from "lucide-react";
+import { QrCode, Download, Share2, Mail, Phone, MapPin } from "lucide-react";
 import { CardData } from "@/types";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CardQuickPreviewProps {
   cardData: CardData;
@@ -26,17 +27,29 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPreviewLabels, setShowPreviewLabels] = useState(true);
+  const { toast } = useToast();
 
   const cardUrl = cardData.cardId
     ? `${window.location.origin}/card/${cardData.cardId}`
     : "";
 
   // Generate QR Code URL with better size and error correction
-  const qrCodeUrl = cardData.cardId
-    ? `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${encodeURIComponent(
-        cardUrl
-      )}&chco=000000&chld=L|1`
-    : "";
+  const getQrCodeUrl = () => {
+    if (!cardData.cardId) return "";
+
+    // If website is provided, create QR for website
+    if (cardData.linkedInWebsite) {
+      return `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${encodeURIComponent(cardData.linkedInWebsite)}&chco=000000&chld=H|1`;
+    } 
+    // If WhatsApp number is available, create WhatsApp QR
+    else if (cardData.phone) {
+      // Format number for WhatsApp (remove spaces, dashes, etc.)
+      const formattedPhone = cardData.phone.replace(/\D/g, '');
+      return `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${encodeURIComponent(`https://wa.me/${formattedPhone}`)}&chco=000000&chld=H|1`;
+    }
+    // Default to card URL
+    return `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${encodeURIComponent(cardUrl)}&chco=000000&chld=H|1`;
+  };
 
   // Download the preview as image
   const handleDownload = async () => {
@@ -53,16 +66,33 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: null,
         useCORS: true,
-        scale: 2,
+        scale: 3, // Higher resolution
         logging: false,
+        onclone: (document, element) => {
+          // Make sure all images are loaded properly in the clone
+          const images = element.getElementsByTagName('img');
+          for (let i = 0; i < images.length; i++) {
+            images[i].crossOrigin = "anonymous";
+          }
+        }
       });
       
       const link = document.createElement("a");
       link.download = `vistafy-card-${cardData.cardId || "preview"}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
+      
+      toast({
+        title: "Card downloaded",
+        description: "Business card image downloaded successfully.",
+      });
     } catch (error) {
       console.error("Failed to download card:", error);
+      toast({
+        title: "Download failed",
+        description: "There was an error downloading your card.",
+        variant: "destructive",
+      });
     } finally {
       // Restore labels after download
       setShowPreviewLabels(true);
@@ -92,6 +122,8 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
     }
   };
 
+  const qrCodeUrl = getQrCodeUrl();
+
   return (
     <div ref={previewRef}>
       <CardTemplateSelector template={template} setTemplate={setTemplate} />
@@ -112,6 +144,7 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
         )}
         
         <CardContent className={`space-y-3 flex flex-col items-center ${!showPreviewLabels ? 'pt-6' : ''}`}>
+          {/* Updated QR code display */}
           {qrCodeUrl && (
             <div className="bg-white p-2 rounded-md shadow-sm mb-2">
               <img 
@@ -120,6 +153,7 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
                 className="w-32 h-32 mx-auto"
                 draggable={false}
                 crossOrigin="anonymous"
+                style={{ imageRendering: 'high-quality' }}
               />
             </div>
           )}
@@ -135,8 +169,8 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
             
             <div className="text-sm">
               {cardData.email && (
-                <p>
-                  <span className={`font-medium ${getTextClass()}`}>Email:</span>{" "}
+                <p className="flex items-center justify-center gap-2">
+                  <Mail className="w-4 h-4" />
                   <a href={`mailto:${cardData.email}`} className={template === "dark" ? "text-amber-400 hover:underline" : template === "blue" ? "text-blue-200 hover:underline" : "text-vistafy-purple hover:underline"}>
                     {cardData.email}
                   </a>
@@ -144,8 +178,8 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
               )}
               
               {cardData.phone && (
-                <p>
-                  <span className={`font-medium ${getTextClass()}`}>Phone:</span>{" "}
+                <p className="flex items-center justify-center gap-2">
+                  <Phone className="w-4 h-4" />
                   <a href={`tel:${cardData.phone}`} className={template === "dark" ? "text-amber-400 hover:underline" : template === "blue" ? "text-blue-200 hover:underline" : "text-vistafy-purple hover:underline"}>
                     {cardData.phone}
                   </a>
@@ -153,8 +187,8 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
               )}
               
               {cardData.location && (
-                <p>
-                  <span className={`font-medium ${getTextClass()}`}>Location:</span>{" "}
+                <p className="flex items-center justify-center gap-2">
+                  <MapPin className="w-4 h-4" />
                   <span className={template === "dark" ? "text-amber-400" : template === "blue" ? "text-blue-200" : "text-vistafy-purple"}>
                     {cardData.location}
                   </span>
@@ -187,7 +221,15 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
           {isDownloading ? "Processing..." : "Download Card"}
         </Button>
         
-        <Button variant="outline" className="flex-shrink-0" onClick={() => navigator.clipboard.writeText(cardUrl)} disabled={!cardUrl}>
+        <Button variant="outline" className="flex-shrink-0" onClick={() => {
+          if (cardUrl) {
+            navigator.clipboard.writeText(cardUrl);
+            toast({
+              title: "Link copied!",
+              description: "Card URL copied to clipboard",
+            });
+          }
+        }} disabled={!cardUrl}>
           <Share2 className="w-4 h-4" />
         </Button>
       </div>

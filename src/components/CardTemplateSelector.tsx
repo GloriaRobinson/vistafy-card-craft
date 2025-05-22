@@ -30,6 +30,7 @@ const CardTemplateSelector: React.FC<CardTemplateSelectorProps> = ({ template, s
               ${template === tpl.value ? 'ring-2 ring-vistafy-purple scale-110' : 'opacity-80 hover:opacity-100 border border-gray-200'}
             `}
             title={tpl.label}
+            aria-label={`Select ${tpl.label} template`}
           >
             {template === tpl.value && (
               <div className="absolute inset-0 flex items-center justify-center">
