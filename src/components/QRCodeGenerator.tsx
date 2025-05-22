@@ -114,7 +114,6 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ cardId, websiteUrl, p
                 alt="QR Code for your digital business card"
                 className="w-full h-auto max-w-[200px]"
                 crossOrigin="anonymous"
-                style={{ imageRendering: 'high-quality' }}
               />
             </div>
             <p className="text-sm text-center text-muted-foreground">

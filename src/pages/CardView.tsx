@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -210,7 +209,6 @@ const CardView: React.FC = () => {
                     alt="QR Code"
                     className="w-full h-auto max-w-[240px]"
                     crossOrigin="anonymous"
-                    style={{ imageRendering: 'high-quality' }}
                   />
                 </div>
               </CardContent>
@@ -345,7 +343,6 @@ const ProfessionalCardPreview: React.FC<{ cardData: CardData }> = ({ cardData })
               alt="QR Code"
               className="mx-auto w-24 h-24 bg-white p-1 rounded-md shadow-sm"
               crossOrigin="anonymous"
-              style={{ imageRendering: 'high-quality' }}
             />
           </div>
         </div>

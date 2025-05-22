@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -153,7 +152,6 @@ const CardQuickPreview: React.FC<CardQuickPreviewProps> = ({ cardData }) => {
                 className="w-32 h-32 mx-auto"
                 draggable={false}
                 crossOrigin="anonymous"
-                style={{ imageRendering: 'high-quality' }}
               />
             </div>
           )}
