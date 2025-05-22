@@ -93,6 +93,9 @@ const Index: React.FC = () => {
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} Vistafy • The Digital Business Card Generator
           </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Developed by <a href="https://developergloria.vercel.app" target="_blank" rel="noopener noreferrer" className="underline hover:text-vistafy-purple transition-colors">developergloria</a>
+          </p>
         </div>
       </footer>
     </div>

@@ -131,6 +131,9 @@ const CardView: React.FC = () => {
           <p className="text-xs text-muted-foreground">
             Powered by <span className="font-medium text-vistafy-purple">Vistafy</span> • The Digital Business Card Generator
           </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Developed by <a href="https://developergloria.vercel.app" target="_blank" rel="noopener noreferrer" className="underline hover:text-vistafy-purple transition-colors">developergloria</a>
+          </p>
         </div>
       </div>
     </div>
